@@ -138,6 +138,13 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # DRF: locked by default, so a view that forgets permissions is closed, not open.
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': ['rest_framework.authentication.TokenAuthentication'],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',  # the React app / curl
+        'rest_framework.authentication.SessionAuthentication',  # the browsable API (CSRF-protected)
+    ],
     'DEFAULT_PERMISSION_CLASSES': ['rest_framework.permissions.IsAuthenticated'],
 }
+
+
+# Where the browsable-API session login lands (default /accounts/profile/ is a 404).
+LOGIN_REDIRECT_URL = '/api/'

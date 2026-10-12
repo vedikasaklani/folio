@@ -12,5 +12,6 @@ router.register('pages', PageViewSet, basename='page')
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/auth/', include('accounts.urls')),
+    path('browser-login/', include('rest_framework.urls')),  # session login for the browsable API only
     path('api/', include(router.urls)),
 ]
