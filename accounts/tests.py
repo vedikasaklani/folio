@@ -16,9 +16,15 @@ class AccountsTests(APITestCase):
         self.client.post('/api/auth/register/', NEW)
         self.assertNotEqual(User.objects.get(username='ada').password, NEW['password'])
 
+    def test_blank_email_is_400(self):
+        r = self.client.post('/api/auth/register/', {**NEW, 'email': ''})
+        self.assertEqual(r.status_code, 400)
+        self.assertIn('email', r.data)
+
     def test_weak_password_is_400(self):
         r = self.client.post('/api/auth/register/', {**NEW, 'password': '123'})
         self.assertEqual(r.status_code, 400)
+        self.assertIn('password', r.data)
         self.assertFalse(User.objects.exists())
 
     def test_login(self):
