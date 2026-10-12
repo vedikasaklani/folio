@@ -21,13 +21,10 @@ class Page(models.Model):
             raise ValidationError({'parent': "The parent page must be in the same workspace."})
         node=self.parent
         while node:
-            if node.parent and node.parent.id==self.id:
-                raise ValidationError('A page cannot be its own parent')
+            if self.pk and node.pk==self.pk:
+                raise ValidationError({'parent': 'A page cannot be its own ancestor.'})
             node=node.parent
 
-    def save(self, *args, **kwargs):
-            self.full_clean() 
-            super().save(*args, **kwargs)
     def __str__(self):
         return self.name
 
