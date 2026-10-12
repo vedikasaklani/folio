@@ -1,0 +1,32 @@
+.ui-seg {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: var(--s-1);
+  padding: var(--s-1);
+  background: var(--cream);
+  border-radius: var(--r-pill);
+}
+
+.ui-seg__item {
+  height: 2.375rem;
+  padding: 0 var(--s-4);
+  background: transparent;
+  border: 0;
+  border-radius: var(--r-pill);
+  color: var(--muted);
+  font: var(--fw-medium) 0.875rem/1 var(--font-body);
+  cursor: pointer;
+  transition:
+    background var(--dur) var(--ease),
+    color var(--dur) var(--ease);
+}
+
+.ui-seg__item:hover:not(.is-active) {
+  color: var(--ink);
+}
+
+.ui-seg__item.is-active {
+  background: var(--ink);
+  color: var(--cream);
+}

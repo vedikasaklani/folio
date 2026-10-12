@@ -1,0 +1,72 @@
+.ui-field {
+  display: grid;
+  gap: var(--s-2);
+}
+
+.ui-field__control {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  height: 2.875rem;
+  padding: 0 var(--s-3) 0 var(--s-4);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  color: var(--muted);
+  transition:
+    border-color var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease);
+}
+
+.ui-field__control:focus-within {
+  border-color: var(--ink);
+  box-shadow: 0 0 0 3px rgb(18 18 18 / 0.12);
+}
+
+.ui-field__control.is-invalid {
+  border-color: var(--danger);
+}
+
+.ui-field__control input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  background: transparent;
+  border: 0;
+  outline: 0;
+  color: var(--ink);
+  font-size: 1rem; /* 16px keeps iOS from zooming on focus */
+}
+
+.ui-field__control input::placeholder {
+  color: var(--muted);
+  opacity: 0.7;
+}
+
+.ui-field__toggle {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: var(--r-pill);
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.ui-field__toggle:hover {
+  background: var(--sand);
+  color: var(--ink);
+}
+
+.ui-field__msg {
+  font: var(--fw-regular) 0.8125rem/1.4 var(--font-body);
+  color: var(--muted);
+}
+
+.ui-field__msg--error {
+  color: var(--danger);
+  font-weight: var(--fw-medium);
+}
