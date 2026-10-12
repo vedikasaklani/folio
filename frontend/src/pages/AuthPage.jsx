@@ -33,7 +33,11 @@ function toFormErrors(err) {
   for (const [key, msgs] of Object.entries(err.data ?? {})) {
     errors[key === 'non_field_errors' ? 'form' : key] = [msgs].flat().join(' ')
   }
-  if (errors.form?.startsWith('Unable to log in')) errors.form = 'Username or password is incorrect.'
+  if (errors.form?.startsWith('Unable to log in')) {
+    delete errors.form
+    errors.password = 'Username or password is incorrect.'
+    errors.credentials = true // outlines the username too
+  }
   return Object.keys(errors).length ? errors : { form: 'Something went wrong. Try again.' }
 }
 
@@ -49,6 +53,11 @@ export default function AuthPage({ onAuth }) {
   function handleChange(e) {
     const { name, value } = e.target
     setValues((v) => ({ ...v, [name]: value }))
+    setErrors((prev) => {
+      const { [name]: _fixed, ...rest } = prev // editing a field clears its error
+      if (prev.credentials) return {} // a wrong login is one problem shared by both fields
+      return rest
+    })
   }
 
   function handleModeChange(next) {
@@ -103,7 +112,7 @@ export default function AuthPage({ onAuth }) {
             <p className="t-body t-muted">{copy.lead}</p>
           </header>
 
-          <form className="auth__fields" onSubmit={handleSubmit}>
+          <form className="auth__fields" onSubmit={handleSubmit} noValidate>
             {errors.form && <Alert>{errors.form}</Alert>}
             <Field
               label="Username"
@@ -113,6 +122,7 @@ export default function AuthPage({ onAuth }) {
               value={values.username}
               onChange={handleChange}
               error={errors.username}
+              invalid={errors.credentials}
               required
             />
             {isRegister && (
