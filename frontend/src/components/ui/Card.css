@@ -1,0 +1,30 @@
+.ui-card {
+  padding: var(--s-5);
+  border-radius: var(--r-lg);
+  color: var(--ink);
+}
+
+.ui-card--surface {
+  background: var(--sand);
+}
+
+.ui-card--ink {
+  background: var(--ink);
+  color: var(--cream);
+}
+
+.ui-card--tint.ui-card--pink {
+  background: var(--pink);
+}
+
+.ui-card--tint.ui-card--blue {
+  background: var(--blue);
+}
+
+.ui-card--tint.ui-card--yellow {
+  background: var(--yellow);
+}
+
+.ui-card--tint.ui-card--olive {
+  background: var(--olive);
+}
