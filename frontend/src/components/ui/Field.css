@@ -25,6 +25,13 @@
 
 .ui-field__control.is-invalid {
   border-color: var(--danger);
+  box-shadow: 0 0 0 1px var(--danger);
+}
+
+.ui-field__control.is-invalid:focus-within {
+  box-shadow:
+    0 0 0 1px var(--danger),
+    0 0 0 4px rgb(var(--danger-rgb) / 0.18);
 }
 
 .ui-field__control input {

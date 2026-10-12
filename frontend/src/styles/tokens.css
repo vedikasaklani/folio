@@ -21,8 +21,8 @@
   --olive: #9da86e;
 
   /* feedback */
-  --danger: #a8281f;
-  --danger-bg: #f7d6cf;
+  --danger: #a8433a; /* muted red: outlines and messages, 4.8:1 on sand */
+  --danger-rgb: 168 67 58;
 
   /* type families: display for titles and big numbers, body for everything else */
   --font-display: 'Bricolage Grotesque', 'Instrument Sans', system-ui, sans-serif;

@@ -3,26 +3,28 @@ import { cx } from './cx'
 import { Eye, EyeOff, Lock } from './icons'
 import './Field.css'
 
-export function Field({ label, error, hint, icon: Icon, trailing, className, ...inputProps }) {
+// error: message shown under the field. invalid: red outline only (the message lives on another field).
+export function Field({ label, error, invalid, hint, icon: Icon, trailing, className, ...inputProps }) {
   const id = useId()
   const message = error || hint
+  const outlined = Boolean(error || invalid)
   return (
     <div className={cx('ui-field', className)}>
       <label htmlFor={id} className="t-label">
         {label}
       </label>
-      <div className={cx('ui-field__control', error && 'is-invalid')}>
+      <div className={cx('ui-field__control', outlined && 'is-invalid')}>
         {Icon && <Icon aria-hidden="true" />}
         <input
           id={id}
-          aria-invalid={error ? true : undefined}
+          aria-invalid={outlined || undefined}
           aria-describedby={message ? `${id}-msg` : undefined}
           {...inputProps}
         />
         {trailing}
       </div>
       {message && (
-        <p id={`${id}-msg`} className={cx('ui-field__msg', error && 'ui-field__msg--error')}>
+        <p id={`${id}-msg`} className={cx('ui-field__msg', error && 'ui-field__msg--error')} role={error ? 'alert' : undefined}>
           {message}
         </p>
       )}

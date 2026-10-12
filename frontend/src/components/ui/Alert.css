@@ -1,10 +1,7 @@
 .ui-alert {
   display: flex;
   align-items: flex-start;
-  gap: var(--s-3);
-  padding: var(--s-3) var(--s-4);
-  background: var(--danger-bg);
-  border-radius: var(--r-md);
+  gap: var(--s-2);
   color: var(--danger);
   font: var(--fw-medium) 0.875rem/1.45 var(--font-body);
 }
