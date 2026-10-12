@@ -1,0 +1,107 @@
+.auth {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto 1fr; /* compact brand bar on top, form takes the rest */
+  gap: var(--s-4);
+  min-height: 100dvh;
+  padding: var(--s-4);
+}
+
+/* Brand panel: just the wordmark on small screens, full pitch from 900px. */
+.auth__brand {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-6);
+  padding: var(--s-5) var(--s-6);
+}
+
+.auth__logo {
+  font: var(--fw-bold) 1.75rem/1 var(--font-display);
+  letter-spacing: -0.04em;
+}
+
+.auth__pitch,
+.auth__stack {
+  display: none;
+}
+
+.auth__lead {
+  margin-top: var(--s-4);
+  max-width: 26rem;
+  color: rgb(250 244 228 / 0.72);
+}
+
+.auth__stack {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.auth__item {
+  display: flex;
+  align-items: center;
+  gap: var(--s-4);
+  padding: var(--s-4);
+  border-radius: var(--r-md);
+}
+
+.auth__item > div {
+  flex: 1;
+}
+
+.auth__form {
+  display: grid;
+  place-items: center;
+}
+
+.auth__card {
+  display: grid;
+  gap: var(--s-5);
+  width: 100%;
+  max-width: 28rem;
+  padding: var(--s-5);
+}
+
+.auth__head {
+  display: grid;
+  gap: var(--s-2);
+}
+
+.auth__fields {
+  display: grid;
+  gap: var(--s-4);
+}
+
+@media (min-width: 900px) {
+  .auth {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    grid-template-rows: 1fr;
+  }
+
+  .auth__brand {
+    justify-content: space-between;
+    padding: var(--s-6);
+  }
+
+  .auth__pitch {
+    display: block;
+  }
+
+  .auth__stack {
+    display: grid;
+    gap: var(--s-3);
+  }
+
+  /* Stagger the stack so it reads as pages piling up, not a uniform grid. */
+  .auth__stack li:nth-child(odd) {
+    margin-right: var(--s-7);
+  }
+
+  .auth__stack li:nth-child(even) {
+    margin-left: var(--s-7);
+  }
+
+  .auth__card {
+    padding: var(--s-6);
+  }
+}
