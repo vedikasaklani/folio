@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'workspaces',
     'rest_framework',
     'rest_framework.authtoken',
+    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -51,6 +52,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  # must sit above CommonMiddleware
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -148,3 +150,7 @@ REST_FRAMEWORK = {
 
 # Where the browsable-API session login lands (default /accounts/profile/ is a 404).
 LOGIN_REDIRECT_URL = '/api/'
+
+
+# The React dev server. Add the deployed frontend origin here later.
+CORS_ALLOWED_ORIGINS = ["http://localhost:5173"]
