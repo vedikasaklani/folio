@@ -1,0 +1,55 @@
+/* Design tokens. Colors are sampled from the reference screenshot. */
+:root {
+  color-scheme: light;
+
+  /* surfaces */
+  --cream: #faf4e4; /* page */
+  --paper: #fffbf0; /* inputs, raised rows */
+  --sand: #ede7d9; /* default container */
+  --sand-strong: #e1dac8; /* hover on sand */
+  --line: #d6d2c7;
+
+  /* text */
+  --ink: #121212;
+  --ink-soft: #2b2a27;
+  --muted: #675f58;
+
+  /* accents: always carry ink text */
+  --pink: #f5b8da;
+  --blue: #b6caeb;
+  --yellow: #f6d868;
+  --olive: #9da86e;
+
+  /* feedback */
+  --danger: #a8281f;
+  --danger-bg: #f7d6cf;
+
+  /* type families: display for titles and big numbers, body for everything else */
+  --font-display: 'Bricolage Grotesque', 'Instrument Sans', system-ui, sans-serif;
+  --font-body: 'Instrument Sans', system-ui, sans-serif;
+
+  /* weight encodes importance: bold > semibold > medium > regular */
+  --fw-regular: 400; /* running text */
+  --fw-medium: 500; /* labels, buttons, captions */
+  --fw-semibold: 600; /* headings, titles */
+  --fw-bold: 700; /* display, hero numbers */
+
+  /* spacing scale */
+  --s-1: 0.25rem;
+  --s-2: 0.5rem;
+  --s-3: 0.75rem;
+  --s-4: 1rem;
+  --s-5: 1.5rem;
+  --s-6: 2rem;
+  --s-7: 3rem;
+
+  /* corner radii */
+  --r-sm: 0.625rem;
+  --r-md: 0.875rem;
+  --r-lg: 1.375rem;
+  --r-pill: 999px;
+
+  /* motion */
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --dur: 140ms;
+}
