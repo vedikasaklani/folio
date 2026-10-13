@@ -145,6 +145,11 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',  # the browsable API (CSRF-protected)
     ],
     'DEFAULT_PERMISSION_CLASSES': ['rest_framework.permissions.IsAuthenticated'],
+    'DEFAULT_PARSER_CLASSES': [
+        'folio.parsers.SafeJSONParser',
+        'rest_framework.parsers.FormParser',  # the browsable API's HTML forms
+        'rest_framework.parsers.MultiPartParser',
+    ],
 }
 
 
