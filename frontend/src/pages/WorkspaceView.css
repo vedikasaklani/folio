@@ -1,0 +1,140 @@
+/* Mobile first: the sidebar is a panel stacked above the editor. The tree scrolls; the footer never moves. */
+.view {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-height: 100dvh;
+}
+
+.view__side {
+  position: relative; /* anchors the edge handles */
+}
+
+.view__panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  max-height: 45dvh;
+  padding: var(--s-4);
+  background: var(--paper);
+  border-bottom: 1px solid var(--line);
+}
+
+.view__head {
+  display: grid;
+  gap: var(--s-2);
+  justify-items: start;
+  padding-right: 4.5rem; /* room for the two handles in the corner */
+  overflow-wrap: anywhere; /* long workspace names wrap instead of being cut */
+}
+
+.view__tree {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.view__foot {
+  display: flex;
+  flex: none;
+}
+
+.view__edge {
+  position: absolute;
+  top: var(--s-3);
+  right: var(--s-3);
+  z-index: 2; /* above the editor's sticky bar */
+  display: flex;
+  gap: var(--s-1);
+}
+
+/* Collapsed on mobile: the panel shrinks to one compact bar. */
+.is-collapsed .view__panel {
+  flex-direction: row;
+  align-items: center;
+  max-height: none;
+  padding-right: 5.5rem;
+}
+
+.is-collapsed .view__head {
+  flex: 1;
+  grid-auto-flow: column;
+  align-items: center;
+  justify-content: start;
+  padding-right: 0;
+}
+
+.is-collapsed .view__tree {
+  flex: none;
+  overflow: visible;
+}
+
+.view__main {
+  min-width: 0;
+  padding: var(--s-4);
+}
+
+.view__empty {
+  display: grid;
+  justify-items: center;
+  gap: var(--s-3);
+  padding-top: 20dvh;
+  color: var(--muted);
+}
+
+.view__empty svg {
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+@media (min-width: 900px) {
+  .view {
+    grid-template-columns: 18rem minmax(0, 1fr);
+    transition: grid-template-columns var(--dur) var(--ease);
+  }
+
+  .view.is-collapsed {
+    grid-template-columns: 3.5rem minmax(0, 1fr);
+  }
+
+  .view__side {
+    position: sticky;
+    top: 0;
+    height: 100dvh;
+  }
+
+  .view__panel {
+    height: 100%;
+    max-height: none;
+    border-right: 1px solid var(--line);
+    border-bottom: 0;
+  }
+
+  .view__head {
+    padding-right: 0; /* the name gets the full width: the handles sit on the edge instead */
+  }
+
+  /* Handles straddle the sidebar's right border. */
+  .view__edge {
+    top: var(--s-4);
+    right: -0.875rem;
+    flex-direction: column;
+  }
+
+  .is-collapsed .view__panel {
+    flex-direction: column;
+    align-items: center;
+    padding: 5.5rem var(--s-2) var(--s-4); /* content starts below the two edge handles */
+  }
+
+  .is-collapsed .view__head {
+    display: none;
+  }
+
+  .is-collapsed .view__tree {
+    flex: 1; /* keeps the footer at the bottom of the rail */
+  }
+
+  .view__main {
+    padding: var(--s-6);
+  }
+}

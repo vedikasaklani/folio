@@ -1,0 +1,136 @@
+.pane {
+  display: grid;
+  align-content: start;
+  gap: var(--s-5);
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: var(--s-4);
+}
+
+.pane__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.pane__logo {
+  font: var(--fw-bold) 1.75rem/1 var(--font-display);
+  letter-spacing: -0.04em;
+}
+
+.pane__grid {
+  display: grid;
+  /* auto-fill (not auto-fit) keeps empty tracks, so one or two cards never stretch wider than the rest */
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+  grid-auto-rows: 1fr; /* every row as tall as the tallest card: one standard size */
+  gap: var(--s-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ws-card {
+  position: relative; /* anchors the stretched "open" button */
+  display: grid;
+  align-content: start;
+  gap: var(--s-3);
+  min-height: 11rem;
+}
+
+.ws-card__top {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: var(--s-3);
+}
+
+/* The name is the real button; ::after stretches its hit area over the whole card. */
+.ws-card__open {
+  padding: 0;
+  background: none;
+  border: 0;
+  text-align: left;
+  cursor: pointer;
+}
+
+.ws-card__open::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--r-lg);
+}
+
+.ws-card__open:focus-visible {
+  outline: none;
+}
+
+.ws-card__open:focus-visible::after {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.ws-card:has(.ws-card__open:hover) {
+  box-shadow: 0 0 0 2px var(--ink);
+}
+
+.ws-card__desc {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.ws-card__members {
+  display: grid;
+  gap: var(--s-2);
+  align-self: end;
+}
+
+.ws-card__members p {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+}
+
+.ws-card__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ws-card--new {
+  display: grid;
+  align-content: stretch; /* fill the card so the label centers */
+  border: 2px dashed var(--line);
+  border-radius: var(--r-lg);
+}
+
+.ws-card__new {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-2);
+  background: none;
+  border: 0;
+  border-radius: var(--r-lg);
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.ws-card__new:hover {
+  background: var(--sand);
+  color: var(--ink);
+}
+
+.ws-card__form {
+  display: grid;
+  gap: var(--s-3);
+}
+
+.ws-card__actions {
+  display: flex;
+  gap: var(--s-2);
+}
