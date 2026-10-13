@@ -4,7 +4,7 @@ import './Button.css'
 
 export default function Button({
   variant = 'primary', // primary | soft | ghost
-  size = 'md', // md | sm
+  size = 'md', // md | sm | xs
   icon: Icon,
   iconAfter: IconAfter,
   loading = false,

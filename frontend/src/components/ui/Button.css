@@ -25,6 +25,13 @@
   font-size: 0.875rem;
 }
 
+/* xs: utility actions (New page, Sign out) that must not compete with the primary action. */
+.ui-btn--xs {
+  height: 1.875rem;
+  padding: 0 0.75rem;
+  font-size: 0.8125rem;
+}
+
 .ui-btn--block {
   width: 100%;
 }

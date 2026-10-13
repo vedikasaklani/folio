@@ -1,0 +1,48 @@
+.ui-iconbtn {
+  display: grid;
+  place-items: center;
+  flex: none;
+  padding: 0;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--r-pill);
+  color: var(--muted);
+  cursor: pointer;
+  transition:
+    background var(--dur) var(--ease),
+    color var(--dur) var(--ease);
+}
+
+.ui-iconbtn svg.lucide {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+.ui-iconbtn--sm {
+  width: 1.75rem;
+  height: 1.75rem;
+}
+
+.ui-iconbtn--md {
+  width: 2.25rem;
+  height: 2.25rem;
+}
+
+.ui-iconbtn:hover:not(:disabled) {
+  background: var(--sand);
+  color: var(--ink);
+}
+
+.ui-iconbtn--raised {
+  background: var(--paper);
+  border-color: var(--line);
+  color: var(--ink);
+}
+
+/* Fingers need bigger targets than cursors. */
+@media (pointer: coarse) {
+  .ui-iconbtn--sm {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+}
