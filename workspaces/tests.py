@@ -61,10 +61,20 @@ class WorkspaceApiTests(APITestCase):
         self.assertEqual(self.client.delete(self.url).status_code, 204)
         self.assertFalse(Workspace.objects.filter(id=self.ws.id).exists())
 
-    def test_list_is_one_query_regardless_of_size(self):
+    def test_list_query_count_is_constant_and_includes_members(self):
         for i in range(3):
             w = Workspace.objects.create(name=f'extra{i}')
             TeamMember.objects.create(member=self.u['viewer'], workspace=w)
         self.as_('viewer')
-        with self.assertNumQueries(1):
-            self.assertEqual(len(self.client.get('/api/workspaces/').data), 4)
+        with self.assertNumQueries(2):  # workspaces + one prefetch for all members
+            data = self.client.get('/api/workspaces/').data
+        self.assertEqual(len(data), 4)
+        self.assertEqual([(m['username'], m['role'], m['is_you']) for m in data[0]['members']],
+                         [('Acme-owner', R.OWNER, False), ('Acme-admin', R.ADMIN, False),
+                          ('Acme-editor', R.EDITOR, False), ('Acme-viewer', R.VIEWER, True)])
+        self.assertEqual(data[1]['members'], [{'username': 'Acme-viewer', 'role': R.VIEWER, 'is_you': True}])
+
+    def test_create_response_lists_the_owner(self):
+        self.as_('outsider')
+        r = self.client.post('/api/workspaces/', {'name': 'Mine'})
+        self.assertEqual(r.data['members'], [{'username': 'Acme-outsider', 'role': R.OWNER, 'is_you': True}])

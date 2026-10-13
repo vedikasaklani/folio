@@ -1,5 +1,5 @@
 from django.db import transaction
-from django.db.models import F
+from django.db.models import F, Prefetch
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 
@@ -22,7 +22,8 @@ class WorkspaceViewSet(viewsets.ModelViewSet):
         # Only workspaces the caller belongs to: outsiders get 404, not 403.
         # One join gives us the role too (unique constraint => one row per user+workspace).
         return (Workspace.objects.filter(memberships__member=self.request.user)
-                .annotate(role=F('memberships__role')).order_by('id'))
+                .annotate(role=F('memberships__role')).order_by('id')
+                .prefetch_related(Prefetch('memberships', TeamMember.objects.select_related('member').order_by('id'))))
 
     def perform_create(self, serializer):
         with transaction.atomic():  # workspace + owner row, or neither
