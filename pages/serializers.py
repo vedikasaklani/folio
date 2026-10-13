@@ -5,6 +5,16 @@ from workspaces.models import Workspace
 from .models import Page
 
 
+class PageListSerializer(serializers.ModelSerializer):
+    """Sidebar row: no text (it can be large). has_children is annotated in the view."""
+    has_children = serializers.BooleanField(read_only=True)
+
+    class Meta:
+        model = Page
+        fields = ('id', 'workspace', 'parent', 'name', 'has_children')
+        read_only_fields = fields
+
+
 class PageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Page

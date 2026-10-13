@@ -46,16 +46,34 @@ class PageApiTests(APITestCase):
             self.assertEqual(self.client.delete(self.url).status_code, expected, label)
         self.assertFalse(Page.objects.filter(id=self.child.id).exists())  # CASCADE takes the subtree
 
-    def test_list_is_flat_scoped_and_one_query(self):
+    def names(self, **params):
+        return [p['name'] for p in self.client.get('/api/pages/', params).data['results']]
+
+    def test_list_is_one_level_scoped_and_one_query(self):
         Page.objects.create(workspace=self.other_ws, name='Secret')
         self.as_('viewer')
         with self.assertNumQueries(1):
-            r = self.client.get('/api/pages/', {'workspace': self.ws.id})
-        self.assertEqual([p['name'] for p in r.data], ['Root', 'Child'])
-        self.assertEqual(r.data[1]['parent'], self.root.id)
-        self.assertEqual(len(self.client.get('/api/pages/').data), 2)  # never sees Beta's page
-        self.assertEqual(self.client.get('/api/pages/', {'workspace': self.other_ws.id}).data, [])
-        self.assertEqual(self.client.get('/api/pages/', {'workspace': 'abc'}).status_code, 400)
+            r = self.client.get('/api/pages/', {'workspace': self.ws.id, 'parent': 'null'})
+        self.assertEqual([(p['name'], p['has_children']) for p in r.data['results']], [('Root', True)])
+        self.assertNotIn('text', r.data['results'][0])
+        r = self.client.get('/api/pages/', {'workspace': self.ws.id, 'parent': self.root.id})
+        self.assertEqual([(p['name'], p['has_children'], p['parent']) for p in r.data['results']],
+                         [('Child', False, self.root.id)])
+        self.assertEqual(self.names(), ['Root', 'Child'])  # never sees Beta's page
+        self.assertEqual(self.names(workspace=self.other_ws.id), [])
+        for bad in ({'workspace': 'abc'}, {'parent': 'abc'}):
+            self.assertEqual(self.client.get('/api/pages/', bad).status_code, 400)
+
+    def test_list_is_cursor_paginated(self):
+        Page.objects.bulk_create(Page(workspace=self.ws, name=f'p{i}') for i in range(25))
+        self.as_('viewer')
+        first = self.client.get('/api/pages/', {'workspace': self.ws.id, 'parent': 'null'}).data
+        self.assertEqual(len(first['results']), 20)
+        second = self.client.get(first['next']).data
+        self.assertEqual(len(second['results']), 6)  # 26 roots in total
+        self.assertIsNone(second['next'])
+        ids = [p['id'] for p in first['results'] + second['results']]
+        self.assertEqual(len(set(ids)), 26)
 
     def test_cannot_create_in_workspace_you_are_not_in(self):
         self.client.force_authenticate(self.other_u['owner'])
@@ -79,3 +97,4 @@ class PageApiTests(APITestCase):
         TeamMember.objects.create(member=self.u['editor'], workspace=self.other_ws, role='ED')
         r = self.client.patch(self.url, {'workspace': self.other_ws.id})
         self.assertEqual(r.status_code, 400)
+
