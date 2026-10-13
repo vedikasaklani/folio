@@ -10,7 +10,8 @@ class Page(models.Model):
     author=models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL, related_name='pages')
     workspace=models.ForeignKey(Workspace, on_delete=models.CASCADE, related_name='pages')
     name=models.CharField(max_length=200)
-    text=models.TextField(blank=True)
+    content=models.JSONField(default=dict, blank=True)  # ProseMirror doc; validated in pages/content.py
+    text=models.TextField(blank=True)  # plain-text copy derived from `content` (search, diffs, AI later)
     created_at=models.DateTimeField(auto_now_add=True)
     updated_at=models.DateTimeField(auto_now=True)
     parent=models.ForeignKey('self',on_delete=models.CASCADE, related_name='children', blank=True, null=True)

@@ -98,3 +98,113 @@ class PageApiTests(APITestCase):
         r = self.client.patch(self.url, {'workspace': self.other_ws.id})
         self.assertEqual(r.status_code, 400)
 
+
+def doc(title='Plan', *blocks):
+    return {'type': 'doc', 'content': [
+        {'type': 'title', 'content': [{'type': 'text', 'text': title}] if title else []}, *blocks]}
+
+
+def para(text, *marks):
+    return {'type': 'paragraph', 'content': [{'type': 'text', 'text': text, 'marks': [{'type': m} for m in marks]}]}
+
+
+class PageContentTests(APITestCase):
+    def setUp(self):
+        self.ws, self.u = make_workspace_with_roles('Acme')
+        self.page = Page.objects.create(workspace=self.ws, name='Old')
+        self.url = f'/api/pages/{self.page.id}/'
+        self.client.force_authenticate(self.u['editor'])
+
+    def save(self, content):
+        return self.client.patch(self.url, {'content': content}, format='json')
+
+    def test_save_derives_name_and_text_from_the_document(self):
+        body = [para('hello', 'bold'), {'type': 'heading', 'attrs': {'level': 2}, 'content': [{'type': 'text', 'text': 'H'}]},
+                {'type': 'bulletList', 'content': [{'type': 'listItem', 'content': [para('x')]}]}]
+        r = self.save(doc('Plan', *body))
+        self.assertEqual(r.status_code, 200, r.data)
+        self.assertEqual((r.data['name'], r.data['text']), ('Plan', 'hello\nH\nx'))
+        self.page.refresh_from_db()
+        self.assertEqual(self.page.content['content'][1]['content'][0]['marks'], [{'type': 'bold'}])
+
+    def test_formatting_marks_are_saved_as_names(self):
+        def mark(kind, tone):
+            return {'type': kind, 'attrs': {'tone': tone}}
+        styled = {'type': 'paragraph', 'content': [
+            {'type': 'text', 'text': 'x', 'marks': [mark('highlight', 'yellow'), mark('textColor', 'plum'),
+                                                    mark('fontSize', 'huge'), {'type': 'bold'}]}]}
+        r = self.save(doc('T', styled))
+        self.assertEqual(r.status_code, 200, r.data)
+        self.page.refresh_from_db()
+        self.assertEqual(self.page.content['content'][1], styled)  # stored exactly as sent
+        self.assertEqual(self.page.text, 'x')
+
+    def test_rejects_bad_formatting_values(self):
+        def marked(*marks):
+            return doc('T', {'type': 'paragraph', 'content': [{'type': 'text', 'text': 'x', 'marks': list(marks)}]})
+        bad = {
+            'tone from another mark': {'type': 'highlight', 'attrs': {'tone': 'red'}},
+            'hex instead of a name': {'type': 'highlight', 'attrs': {'tone': '#f6d868'}},
+            'css instead of a name': {'type': 'textColor', 'attrs': {'tone': 'red; position: fixed'}},
+            'unknown size': {'type': 'fontSize', 'attrs': {'tone': 'tiny'}},
+            'missing attrs': {'type': 'highlight'},
+            'empty attrs': {'type': 'textColor', 'attrs': {}},
+            'null tone': {'type': 'fontSize', 'attrs': {'tone': None}},
+            'tone is a list': {'type': 'highlight', 'attrs': {'tone': ['yellow']}},
+            'extra attribute': {'type': 'highlight', 'attrs': {'tone': 'yellow', 'style': 'x'}},
+            'attrs on a plain mark': {'type': 'bold', 'attrs': {'tone': 'yellow'}},
+            'attrs not an object': {'type': 'highlight', 'attrs': 'yellow'},
+            'mark is a string': 'bold',
+        }
+        for label, mark in bad.items():
+            r = self.save(marked(mark))
+            self.assertEqual(r.status_code, 400, label)
+            self.assertIn('content', r.data, label)
+        self.page.refresh_from_db()
+        self.assertEqual(self.page.content, {})
+
+    def test_title_wins_over_name_and_empty_title_is_untitled(self):
+        r = self.client.patch(self.url, {'name': 'Ignored', 'content': doc('Real')}, format='json')
+        self.assertEqual(r.data['name'], 'Real')
+        self.assertEqual(self.save(doc('')).data['name'], 'Untitled')
+
+    def test_text_is_not_client_writable(self):
+        self.client.patch(self.url, {'text': 'forged'}, format='json')
+        self.page.refresh_from_db()
+        self.assertEqual(self.page.text, '')
+
+    def test_viewer_cannot_save_content(self):
+        self.client.force_authenticate(self.u['viewer'])
+        self.assertEqual(self.save(doc()).status_code, 403)
+
+    def test_rejects_anything_outside_the_whitelist(self):
+        deep = para('x')
+        for _ in range(25):
+            deep = {'type': 'blockquote', 'content': [deep]}
+        bad = {
+            'unknown node': doc('T', {'type': 'script', 'content': []}),
+            'unknown mark': doc('T', para('x', 'link')),
+            'mark attrs': doc('T', {'type': 'paragraph', 'content': [
+                {'type': 'text', 'text': 'x', 'marks': [{'type': 'bold', 'attrs': {'style': 'x'}}]}]}),
+            'node attrs': doc('T', {'type': 'paragraph', 'attrs': {'onclick': 'x'}}),
+            'h1 body heading': doc('T', {'type': 'heading', 'attrs': {'level': 1}, 'content': []}),
+            'no title first': {'type': 'doc', 'content': [para('x')]},
+            'empty doc': {'type': 'doc', 'content': []},
+            'second title': doc('T', {'type': 'title', 'content': []}),
+            'marked title': {'type': 'doc', 'content': [{'type': 'title', 'content': [
+                {'type': 'text', 'text': 'x', 'marks': [{'type': 'bold'}]}]}]},
+            'too deep': doc('T', deep),
+            'too large': doc('T', para('x' * 600_000)),
+            'not a doc': {'type': 'paragraph'},
+            'list not object': ['x'],
+        }
+        for label, content in bad.items():
+            r = self.save(content)
+            self.assertEqual(r.status_code, 400, label)
+            self.assertIn('content', r.data, label)
+        self.page.refresh_from_db()
+        self.assertEqual(self.page.content, {})
+
+    def test_absurdly_nested_json_is_400_not_500(self):
+        r = self.client.patch(self.url, '{"content":' + '[' * 20000 + ']' * 20000 + '}', content_type='application/json')
+        self.assertEqual(r.status_code, 400)
