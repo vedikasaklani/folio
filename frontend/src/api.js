@@ -11,7 +11,8 @@ export function setToken(token) {
 // Returns parsed JSON (null for 204). Throws an Error with .status and .data on non-2xx.
 export async function api(path, { method = 'GET', body } = {}) {
   const token = getToken()
-  const res = await fetch(BASE + path, {
+  // Paginated responses carry an absolute `next` URL; plain paths are relative to the API.
+  const res = await fetch(path.startsWith('http') ? path : BASE + path, {
     method,
     headers: {
       ...(body && { 'Content-Type': 'application/json' }),
