@@ -1,0 +1,203 @@
+.doc {
+  container-type: inline-size; /* the bar layout depends on the editor's width, not the screen's */
+  display: grid;
+  gap: var(--s-3);
+}
+
+/* Narrow: the toolbar sits centred on its own row, the save block (note above Save) on the right below it. */
+.doc__bar {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    'tools'
+    'save';
+  align-items: center;
+  gap: var(--s-2);
+  padding: var(--s-2) 0;
+  background: var(--cream);
+}
+
+/* Wide: one row, the toolbar centred above the page and the save block at the right edge. */
+@container (min-width: 52rem) {
+  .doc__bar {
+    grid-template-columns: 1fr auto 1fr;
+    grid-template-areas: '. tools save';
+  }
+}
+
+.doc__save {
+  grid-area: save;
+  justify-self: end;
+  display: grid;
+  justify-items: end;
+  gap: var(--s-1);
+}
+
+.doc__note {
+  min-height: 1.4em; /* keep the line when the note is empty so Save does not jump while typing */
+}
+
+.toolbar {
+  grid-area: tools;
+  justify-self: center;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: var(--s-1);
+  padding: var(--s-1);
+  background: var(--sand);
+  border-radius: var(--r-md);
+}
+
+.toolbar > button {
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+}
+
+.toolbar > button:hover {
+  background: var(--sand-strong);
+}
+
+.toolbar > button[aria-pressed='true'] {
+  background: var(--ink);
+  color: var(--cream);
+}
+
+.toolbar__sep {
+  width: 1px;
+  height: 1.25rem;
+  margin: 0 var(--s-1);
+  background: var(--line);
+}
+
+.doc__body .ProseMirror {
+  min-height: 60dvh;
+  padding: var(--s-5) var(--s-6);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  font-size: 1rem;
+  line-height: 1.65;
+  outline: 0;
+}
+
+.doc__body .ProseMirror:focus-visible {
+  border-color: var(--ink);
+  box-shadow: 0 0 0 3px rgb(18 18 18 / 0.12);
+}
+
+/* Document type roles: the title is the page's h1. */
+.ProseMirror h1 {
+  margin: 0 0 var(--s-4);
+  font: var(--fw-bold) clamp(2rem, 1.4rem + 2vw, 2.75rem) / 1.1 var(--font-display);
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+.ProseMirror h2 {
+  margin: var(--s-5) 0 var(--s-2);
+  font: var(--fw-semibold) 1.5rem/1.2 var(--font-display);
+  letter-spacing: -0.02em;
+}
+
+.ProseMirror h3 {
+  margin: var(--s-4) 0 var(--s-2);
+  font: var(--fw-semibold) 1.1875rem/1.3 var(--font-body);
+}
+
+.ProseMirror p {
+  margin: 0 0 0.75em;
+}
+
+.ProseMirror ul,
+.ProseMirror ol {
+  margin: 0 0 0.75em;
+  padding-left: 1.5rem;
+}
+
+.ProseMirror li p {
+  margin: 0;
+}
+
+.ProseMirror blockquote {
+  margin: 0 0 0.75em;
+  padding-left: var(--s-4);
+  border-left: 3px solid var(--line);
+  color: var(--muted);
+}
+
+/* Placeholder text comes from the node's data-placeholder attribute. */
+.ProseMirror .is-empty::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  color: var(--muted);
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* Text formats. Documents store names ("yellow"); these rules map names to design tokens.
+   Global on purpose: the toolbar menus preview each tone with the same attributes. */
+[data-text-color='red'] {
+  color: var(--text-red);
+}
+
+[data-text-color='blue'] {
+  color: var(--text-blue);
+}
+
+[data-text-color='olive'] {
+  color: var(--text-olive);
+}
+
+[data-text-color='plum'] {
+  color: var(--text-plum);
+}
+
+[data-font-size='small'] {
+  font-size: var(--size-small);
+}
+
+[data-font-size='large'] {
+  font-size: var(--size-large);
+}
+
+[data-font-size='huge'] {
+  font-size: var(--size-huge);
+  line-height: 1.2;
+}
+
+/* Highlight and text colour combine freely: the tokens guarantee every pair is legible. */
+[data-highlight] {
+  padding: 0 0.12em;
+  border-radius: 0.2em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+[data-highlight='yellow'] {
+  background: var(--hl-yellow);
+}
+
+[data-highlight='pink'] {
+  background: var(--hl-pink);
+}
+
+[data-highlight='blue'] {
+  background: var(--hl-blue);
+}
+
+[data-highlight='olive'] {
+  background: var(--hl-olive);
+}

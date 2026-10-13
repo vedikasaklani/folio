@@ -20,6 +20,22 @@
   --yellow: #f6d868;
   --olive: #9da86e;
 
+  /* rich-text formats. Highlights are lighter tints of the accents and text colours are deeper than them,
+     so every text colour reads on every highlight and on paper (>= 4.5:1, enforced by contrast.test.js) */
+  --hl-yellow: #f8e08a;
+  --hl-pink: #f8cfe5;
+  --hl-blue: #cddbf2;
+  --hl-olive: #d3dbae;
+  --text-red: #8f352d;
+  --text-blue: #234a86;
+  --text-olive: #46531e;
+  --text-plum: #74285a;
+
+  /* rich-text sizes, relative to the surrounding text */
+  --size-small: 0.875em;
+  --size-large: 1.25em;
+  --size-huge: 1.75em;
+
   /* feedback */
   --danger: #a8433a; /* muted red: outlines and messages, 4.8:1 on sand */
   --danger-rgb: 168 67 58;

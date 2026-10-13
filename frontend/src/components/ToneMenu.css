@@ -1,0 +1,55 @@
+/* The popover lives in the top layer, so it is positioned from JS (top/left) and never clipped by the toolbar. */
+.tone-menu {
+  position: fixed;
+  inset: auto;
+  margin: 0;
+  width: 12rem; /* keep in step with MENU_WIDTH in ToneMenu.jsx */
+  padding: var(--s-1);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  color: var(--ink);
+}
+
+.tone-menu:popover-open {
+  display: grid;
+  gap: 2px;
+}
+
+.tone-menu button {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  width: 100%;
+  padding: var(--s-2) var(--s-3);
+  background: transparent;
+  border: 0;
+  border-radius: var(--r-sm);
+  font: var(--fw-medium) 0.875rem/1.2 var(--font-body);
+  text-align: left;
+  cursor: pointer;
+}
+
+.tone-menu button:hover {
+  background: var(--sand);
+}
+
+.tone-menu button[aria-pressed='true'] {
+  background: var(--ink);
+  color: var(--cream);
+}
+
+.tone-menu__sample {
+  display: inline-block;
+  min-width: 2.25rem;
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* On the dark "selected" row the sample keeps its own colours, so it sits on a paper chip. */
+.tone-menu button[aria-pressed='true'] .tone-menu__sample {
+  padding: 0 var(--s-1);
+  background: var(--paper);
+  border-radius: var(--r-sm);
+  color: var(--ink);
+}
