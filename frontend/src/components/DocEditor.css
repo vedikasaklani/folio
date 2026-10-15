@@ -82,26 +82,19 @@
   background: var(--line);
 }
 
+/* No box: the text sits straight on the page. The caret is the focus indicator. */
 .doc__body .ProseMirror {
-  min-height: 60dvh;
-  padding: var(--s-5) var(--s-6);
-  background: var(--paper);
-  border: 1px solid var(--line);
-  border-radius: var(--r-lg);
+  min-height: 60dvh; /* the empty page below the text is still a click target */
+  padding: var(--s-4) 0;
   font-size: 1rem;
   line-height: 1.65;
   outline: 0;
 }
 
-.doc__body .ProseMirror:focus-visible {
-  border-color: var(--ink);
-  box-shadow: 0 0 0 3px rgb(18 18 18 / 0.12);
-}
-
 /* Document type roles: the title is the page's h1. */
 .ProseMirror h1 {
   margin: 0 0 var(--s-4);
-  font: var(--fw-bold) clamp(2rem, 1.4rem + 2vw, 2.75rem) / 1.1 var(--font-display);
+  font: var(--fw-bold) clamp(1.75rem, 1.3rem + 1.4vw, 2.25rem) / 1.15 var(--font-display);
   letter-spacing: -0.035em;
   text-wrap: balance;
 }
