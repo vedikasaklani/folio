@@ -163,6 +163,41 @@ class PageContentTests(APITestCase):
         self.page.refresh_from_db()
         self.assertEqual(self.page.content, {})
 
+    def test_code_blocks_keep_every_character(self):
+        code = 'def f(x):\n\tif x:\n        return "caf\u00e9"  \n\n\n    pass\n'
+        block = {'type': 'codeBlock', 'attrs': {'language': 'python'}, 'content': [{'type': 'text', 'text': code}]}
+        inline = {'type': 'paragraph', 'content': [{'type': 'text', 'text': 'run '},
+                                                    {'type': 'text', 'text': 'ls -la', 'marks': [{'type': 'code'}]}]}
+        r = self.save(doc('Snippets', block, inline, {'type': 'codeBlock', 'attrs': {'language': None}}))
+        self.assertEqual(r.status_code, 200, r.data)
+        self.page.refresh_from_db()
+        self.assertEqual(self.page.content['content'][1]['content'][0]['text'], code)  # tabs, blank lines, trailing spaces
+        self.assertEqual(self.page.text.split('\n')[:2], ['def f(x):', '\tif x:'])  # lines survive in the plain-text copy
+
+    def test_code_language_is_a_plain_name(self):
+        def block(language):
+            return doc('T', {'type': 'codeBlock', 'attrs': {'language': language}, 'content': [{'type': 'text', 'text': 'x'}]})
+        for ok in ('python', 'typescriptreact', 'c++', 'c#', 'objective-c', 'plaintext', None):
+            self.assertEqual(self.save(block(ok)).status_code, 200, ok)
+        for bad in ('Python', 'py thon', '"><script>', 'a' * 31, '', ['python'], 7, '../x'):
+            r = self.save(block(bad))
+            self.assertEqual(r.status_code, 400, repr(bad))
+            self.assertIn('content', r.data, repr(bad))
+
+    def test_rejects_malformed_code_blocks(self):
+        text = {'type': 'text', 'text': 'x'}
+        bad = {
+            'paragraph inside': {'type': 'codeBlock', 'content': [{'type': 'paragraph', 'content': [text]}]},
+            'bold inside': {'type': 'codeBlock', 'content': [{'type': 'text', 'text': 'x', 'marks': [{'type': 'bold'}]}]},
+            'extra attribute': {'type': 'codeBlock', 'attrs': {'language': 'python', 'class': 'x'}, 'content': [text]},
+            'marks on the block': {'type': 'codeBlock', 'marks': [{'type': 'bold'}], 'content': [text]},
+            'code mark with attrs': {'type': 'paragraph', 'content': [{'type': 'text', 'text': 'x', 'marks': [{'type': 'code', 'attrs': {'a': 1}}]}]},
+        }
+        for label, node in bad.items():
+            r = self.save(doc('T', node))
+            self.assertEqual(r.status_code, 400, label)
+            self.assertIn('content', r.data, label)
+
     def test_title_wins_over_name_and_empty_title_is_untitled(self):
         r = self.client.patch(self.url, {'name': 'Ignored', 'content': doc('Real')}, format='json')
         self.assertEqual(r.data['name'], 'Real')

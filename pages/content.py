@@ -2,8 +2,14 @@
 a whitelisted subset of the schema; everything else is rejected, never stripped silently.
 The first node is the page title (`title`), and `name` / `text` are derived from the document."""
 
+import re
+
 MAX_BYTES = 500_000
 MAX_DEPTH = 20
+
+# A code block's language is a short lowercase name ("python", "typescriptreact", "c++"); it only ever becomes a CSS class.
+# A pattern rather than a fixed list, because editors send many names and a closed list would turn a paste into a 400.
+LANGUAGE = re.compile(r'[a-z0-9][a-z0-9+#._-]{0,29}')
 
 # node type -> allowed attrs (name -> validator).
 _int = lambda lo, hi: lambda v: isinstance(v, int) and not isinstance(v, bool) and lo <= v <= hi
@@ -14,6 +20,7 @@ NODES = {
     'orderedList': {'start': _int(1, 1_000_000), 'type': lambda v: v is None},
     'listItem': {},
     'blockquote': {},
+    'codeBlock': {'language': lambda v: v is None or (isinstance(v, str) and LANGUAGE.fullmatch(v) is not None)},
     'hardBreak': {},
     'text': {},
 }
@@ -25,7 +32,7 @@ TONES = {
     'fontSize': ('small', 'large', 'huge'),
 }
 MARKS = {
-    'bold': {}, 'italic': {}, 'underline': {}, 'strike': {},
+    'bold': {}, 'italic': {}, 'underline': {}, 'strike': {}, 'code': {},
     **{name: {'tone': tones} for name, tones in TONES.items()},
 }
 
@@ -67,6 +74,8 @@ def _check_node(node, depth):
     children = node.get('content') or []
     if not isinstance(children, list) or (kind == 'text' and children):
         raise ValueError(f'{kind}: invalid content.')
+    if kind == 'codeBlock' and any(c.get('type') != 'text' or c.get('marks') for c in children if isinstance(c, dict)):
+        raise ValueError('A code block holds plain text only.')
     for child in children:
         _check_node(child, depth + 1)
 
