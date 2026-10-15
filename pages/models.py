@@ -1,10 +1,12 @@
-from django.db import models
 from django.contrib.auth import get_user_model
+from django.db import models
+
 from workspaces.models import Workspace
 
 User=get_user_model()
 # Create your models here.
 from django.core.exceptions import ValidationError
+
 
 class Page(models.Model):
     author=models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL, related_name='pages')
