@@ -22,6 +22,7 @@ NODES = {
     'blockquote': {},
     'codeBlock': {'language': lambda v: v is None or (isinstance(v, str) and LANGUAGE.fullmatch(v) is not None)},
     'hardBreak': {},
+    'drawing': {'id': _int(1, 2_000_000_000)},  # the strokes live in the Drawing table, never in the document
     'text': {},
 }
 # Formatting is stored as a *name* ("yellow"), never a CSS value: the client maps names to design tokens.
@@ -74,6 +75,8 @@ def _check_node(node, depth):
     children = node.get('content') or []
     if not isinstance(children, list) or (kind == 'text' and children):
         raise ValueError(f'{kind}: invalid content.')
+    if kind == 'drawing' and (children or not (node.get('attrs') or {}).get('id')):
+        raise ValueError('A drawing block needs an id and holds no content.')
     if kind == 'codeBlock' and any(c.get('type') != 'text' or c.get('marks') for c in children if isinstance(c, dict)):
         raise ValueError('A code block holds plain text only.')
     for child in children:
@@ -97,6 +100,14 @@ def validate_doc(doc):
         _check_node(child, 2)
     for block in blocks[1:]:
         _check_node(block, 1)
+
+
+def drawing_ids(doc):
+    """Every drawing id in the document, in order, repeats kept."""
+    found = [doc['attrs']['id']] if doc.get('type') == 'drawing' else []
+    for child in doc.get('content') or []:
+        found += drawing_ids(child)
+    return found
 
 
 def _text_of(node):

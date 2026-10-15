@@ -33,3 +33,32 @@ class Page(models.Model):
 
  
 
+
+
+class Drawing(models.Model):
+    """One drawing block. A page's content holds {type: 'drawing', attrs: {id}}; the strokes live here."""
+    page=models.ForeignKey(Page, on_delete=models.CASCADE, related_name='drawings')
+    created_at=models.DateTimeField(auto_now_add=True)
+
+    @property
+    def workspace(self):  # lets RolePermission check drawings like pages
+        return self.page.workspace
+
+    def __str__(self):
+        return f'Drawing {self.pk} on {self.page_id}'
+
+
+class Stroke(models.Model):
+    """One pen-down to pen-up. `points` = [[x, y, pressure], ...], raw ints; smoothing happens at render time."""
+    drawing=models.ForeignKey(Drawing, on_delete=models.CASCADE, related_name='strokes')
+    uid=models.UUIDField()  # made by the client, so a retried save can't draw the stroke twice
+    points=models.JSONField()
+    created_by=models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL, related_name='strokes')
+    created_at=models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering=('id',)
+        constraints=[models.UniqueConstraint(fields=('drawing', 'uid'), name='stroke_uid_once_per_drawing')]
+
+    def __str__(self):
+        return f'Stroke {self.uid}'
