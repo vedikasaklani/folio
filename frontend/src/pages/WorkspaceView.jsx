@@ -57,14 +57,14 @@ export default function WorkspaceView({ workspace, tone, onSwitch, onSignOut }) 
         <div className="view__edge" role="group" aria-label="Sidebar controls">
           <IconButton
             variant="raised"
-            size="sm"
+            size="md"
             icon={collapsed ? PanelLeftOpen : PanelLeftClose}
             label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
             aria-expanded={!collapsed}
             aria-controls="sidebar"
             onClick={toggleSidebar}
           />
-          <IconButton variant="raised" size="sm" icon={LayoutGrid} label="Switch workspace" onClick={onSwitch} />
+          <IconButton variant="raised" size="md" icon={LayoutGrid} label="Switch workspace" onClick={onSwitch} />
         </div>
       </div>
       <main className="view__main">

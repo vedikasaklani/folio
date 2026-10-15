@@ -4,7 +4,6 @@ import { fieldErrors } from '../lib/errors'
 import { keyOf } from '../lib/pageTree'
 import Alert from './ui/Alert'
 import Button from './ui/Button'
-import IconButton from './ui/IconButton'
 import { ChevronRight, Plus, Trash2 } from './ui/icons'
 import './PageTree.css'
 
@@ -59,19 +58,6 @@ function Node({ id, ctx }) {
   return (
     <li>
       <div className={`tree__row${ctx.selectedId === id ? ' is-selected' : ''}`}>
-        {page.has_children ? (
-          <button
-            type="button"
-            className="tree__chevron"
-            aria-expanded={open}
-            aria-label={`${open ? 'Collapse' : 'Expand'} ${page.name}`}
-            onClick={() => setOpen(!open)}
-          >
-            <ChevronRight aria-hidden="true" className={open ? 'is-open' : ''} />
-          </button>
-        ) : (
-          <span className="tree__chevron" aria-hidden="true" />
-        )}
         <button
           type="button"
           className="tree__name"
@@ -89,6 +75,17 @@ function Node({ id, ctx }) {
               <Trash2 aria-hidden="true" />
             </button>
           </span>
+        )}
+        {page.has_children && (
+          <button
+            type="button"
+            className="tree__chevron"
+            aria-expanded={open}
+            aria-label={`${open ? 'Collapse' : 'Expand'} ${page.name}`}
+            onClick={() => setOpen(!open)}
+          >
+            <ChevronRight aria-hidden="true" className={open ? 'is-open' : ''} />
+          </button>
         )}
       </div>
       {open && <Level parent={id} ctx={ctx} />}
@@ -137,18 +134,16 @@ export default function PageTree({ workspaceId, tree, dispatch, selectedId, onSe
   const ctx = { tree, load, add, remove, selectedId, onSelect, canWrite }
   return (
     <nav className="tree" aria-label="Pages">
-      <div className="tree__head">
-        {collapsed ? null : <h2 className="t-label t-muted">Pages</h2>}
-        {canWrite ? (
-          collapsed ? (
-            <IconButton icon={Plus} label="New page" onClick={() => add(null)} />
-          ) : (
+      {collapsed ? null : (
+        <div className="tree__head">
+          <h2 className="t-label t-muted">Pages</h2>
+          {canWrite ? (
             <Button variant="soft" size="xs" icon={Plus} onClick={() => add(null)}>
               New page
             </Button>
-          )
-        ) : null}
-      </div>
+          ) : null}
+        </div>
+      )}
       <div className="tree__body" hidden={collapsed} inert={collapsed}>
         {error ? <Alert>{error}</Alert> : null}
         <Level parent={null} ctx={ctx} />
