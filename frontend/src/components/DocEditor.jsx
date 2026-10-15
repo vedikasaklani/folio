@@ -5,6 +5,7 @@ import { useRef, useState } from 'react'
 import { api } from '../api'
 import { docFor } from '../lib/editorDoc'
 import { fieldErrors } from '../lib/errors'
+import { CodeBlock } from '../lib/codeBlock'
 import { toneMarks } from '../lib/marks'
 import EditorToolbar from './EditorToolbar'
 import Alert from './ui/Alert'
@@ -30,12 +31,13 @@ const extensions = [
   Title,
   StarterKit.configure({
     document: false,
+    code: { HTMLAttributes: { spellcheck: 'false' } },
     heading: { levels: [2, 3] },
-    code: false,
-    codeBlock: false,
+    codeBlock: false, // replaced by CodeBlock below (same node, with highlighting)
     horizontalRule: false,
     link: false,
   }),
+  CodeBlock,
   ...toneMarks,
   Placeholder.configure({
     showOnlyCurrent: false,

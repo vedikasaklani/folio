@@ -5,6 +5,7 @@ import {
   ALargeSmall,
   Baseline,
   Bold,
+  Code,
   Heading2,
   Heading3,
   Highlighter,
@@ -12,6 +13,7 @@ import {
   List,
   ListOrdered,
   Quote,
+  SquareCode,
   Strikethrough,
   Underline,
 } from './ui/icons'
@@ -26,6 +28,7 @@ const ITEMS = [
   { label: 'Italic', icon: Italic, run: (c) => c.toggleItalic(), active: (e) => e.isActive('italic') },
   { label: 'Underline', icon: Underline, run: (c) => c.toggleUnderline(), active: (e) => e.isActive('underline') },
   { label: 'Strikethrough', icon: Strikethrough, run: (c) => c.toggleStrike(), active: (e) => e.isActive('strike') },
+  { label: 'Inline code', icon: Code, run: (c) => c.toggleCode(), active: (e) => e.isActive('code') },
   { sep: true },
   { menu: 'textColor' },
   { menu: 'highlight' },
@@ -37,6 +40,13 @@ const ITEMS = [
   { label: 'Bulleted list', icon: List, run: (c) => c.toggleBulletList(), active: (e) => e.isActive('bulletList') },
   { label: 'Numbered list', icon: ListOrdered, run: (c) => c.toggleOrderedList(), active: (e) => e.isActive('orderedList') },
   { label: 'Quote', icon: Quote, run: (c) => c.toggleBlockquote(), active: (e) => e.isActive('blockquote') },
+  {
+    label: 'Code block',
+    hint: 'Code block (Tab indents; Esc then Tab picks the language; Tab again leaves)',
+    icon: SquareCode,
+    run: (c) => c.toggleCodeBlock(),
+    active: (e) => e.isActive('codeBlock'),
+  },
 ]
 
 export default function EditorToolbar({ editor }) {
@@ -60,12 +70,12 @@ export default function EditorToolbar({ editor }) {
             <ToneMenu key={mark} editor={editor} mark={mark} icon={MENU_ICONS[mark]} current={state.tones[mark]} {...menu} />
           )
         }
-        const { label, icon: Icon, run } = item
+        const { label, hint, icon: Icon, run } = item
         return (
           <button
             key={label}
             type="button"
-            title={label}
+            title={hint ?? label}
             aria-label={label}
             aria-pressed={state.active[label]}
             onMouseDown={(e) => e.preventDefault()} // keep focus and selection in the editor

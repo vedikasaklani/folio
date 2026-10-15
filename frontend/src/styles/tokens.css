@@ -31,6 +31,14 @@
   --text-olive: #46531e;
   --text-plum: #74285a;
 
+  /* syntax colours in code blocks: a deliberately pale palette, >= 3.5:1 on --sand (contrast.test.js).
+     Previous, stronger values (>= 4.5:1): #6d645d #a93a83 #5b6c27 #b04137 #3065b6 */
+  --code-comment: #7d736b;
+  --code-keyword: #bf4696;
+  --code-string: #697c2d;
+  --code-number: #c54f45;
+  --code-name: #3d75cc;
+
   /* rich-text sizes, relative to the surrounding text */
   --size-small: 0.875em;
   --size-large: 1.25em;
@@ -43,6 +51,7 @@
   /* type families: display for titles and big numbers, body for everything else */
   --font-display: 'Bricolage Grotesque', 'Instrument Sans', system-ui, sans-serif;
   --font-body: 'Instrument Sans', system-ui, sans-serif;
+  --font-mono: ui-monospace, 'Cascadia Code', 'SF Mono', Consolas, 'Liberation Mono', monospace; /* system stack: nothing to download */
 
   /* weight encodes importance: bold > semibold > medium > regular */
   --fw-regular: 400; /* running text */

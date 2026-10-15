@@ -1,6 +1,7 @@
 .doc {
   container-type: inline-size; /* the bar layout depends on the editor's width, not the screen's */
   display: grid;
+  grid-template-columns: minmax(0, 1fr); /* a long code line must scroll inside its block, not widen the page */
   gap: var(--s-3);
 }
 
@@ -21,7 +22,7 @@
 }
 
 /* Wide: one row, the toolbar centred above the page and the save block at the right edge. */
-@container (min-width: 52rem) {
+@container (min-width: 56rem) {
   .doc__bar {
     grid-template-columns: 1fr auto 1fr;
     grid-template-areas: '. tools save';
@@ -200,4 +201,115 @@
 
 [data-highlight='olive'] {
   background: var(--hl-olive);
+}
+
+/* Code. Blocks keep every space and line break (white-space: pre) and scroll sideways instead of wrapping.
+   The extra .doc__body is needed: the editor library injects its own `.ProseMirror pre { white-space: pre-wrap }`. */
+.ProseMirror code {
+  padding: 0.1em 0.35em;
+  background: var(--sand);
+  border-radius: var(--r-sm);
+  font: 0.875em/1.4 var(--font-mono);
+  font-variant-ligatures: none; /* show -> and != as typed, not as arrows */
+}
+
+.doc__body .ProseMirror pre {
+  position: relative;
+  margin: 0 0 0.75em;
+  padding: var(--s-4);
+  overflow-x: auto;
+  background: var(--sand);
+  border-radius: var(--r-md);
+  color: var(--ink);
+  font: var(--fw-regular) 0.875rem/1.6 var(--font-mono);
+  font-variant-ligatures: none;
+  tab-size: 2;
+  white-space: pre;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+
+.ProseMirror pre code {
+  padding: 0;
+  background: none;
+  border-radius: 0;
+  font: inherit;
+}
+
+/* The block is wrapped in a node view so it can carry its language picker in the top-right corner. */
+.code-block {
+  position: relative;
+  margin: 0 0 0.75em;
+}
+
+.doc__body .ProseMirror .code-block pre {
+  margin: 0;
+}
+
+.code-block__lang {
+  position: absolute;
+  top: var(--s-1);
+  right: var(--s-2);
+  z-index: 1;
+  user-select: none;
+}
+
+.code-block__lang select,
+.code-block__lang span {
+  padding: 0.125rem 0.25rem;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
+  color: var(--muted);
+  font: var(--fw-medium) 0.75rem/1.2 var(--font-body);
+}
+
+.code-block__lang select {
+  cursor: pointer;
+}
+
+.code-block__lang select:hover,
+.code-block__lang select:focus-visible {
+  background: var(--paper);
+  border-color: var(--line);
+  color: var(--ink);
+}
+
+/* Syntax colours: the --code-* tokens, all >= 3.5:1 on the code background (contrast.test.js). */
+.hljs-comment,
+.hljs-quote {
+  color: var(--code-comment);
+  font-style: italic;
+}
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-literal,
+.hljs-doctag,
+.hljs-built_in {
+  color: var(--code-keyword);
+}
+
+.hljs-string,
+.hljs-regexp,
+.hljs-addition {
+  color: var(--code-string);
+}
+
+.hljs-number,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-deletion {
+  color: var(--code-number);
+}
+
+.hljs-title,
+.hljs-attr,
+.hljs-attribute,
+.hljs-name,
+.hljs-property,
+.hljs-section,
+.hljs-selector-class,
+.hljs-selector-id {
+  color: var(--code-name);
 }

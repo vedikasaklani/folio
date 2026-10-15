@@ -33,3 +33,22 @@ describe('rich-text colour tokens', () => {
     }
   }
 })
+
+// Code blocks sit on --sand; every syntax colour (and plain code text) has to read there too.
+// The owner chose a pale palette on purpose: 3.5:1 is below WCAG AA (4.5:1) for small text but clearly legible.
+// This floor stops it drifting paler; raise it back to 4.5 to restore the stronger colours.
+const CODE_MIN = 3.5
+const hex = (name) => tokens.match(new RegExp(`--${name}: *(#[0-9a-f]{6})`, 'i'))[1]
+
+describe('code block colours', () => {
+  it('finds the five syntax tokens', () => {
+    expect(Object.keys(pick('code')).sort()).toEqual(['comment', 'keyword', 'name', 'number', 'string'])
+  })
+
+  const colours = { 'plain code': hex('ink'), ...Object.fromEntries(Object.entries(pick('code')).map(([k, v]) => [`syntax ${k}`, v])) }
+  for (const [name, value] of Object.entries(colours)) {
+    it(`${name} on the code background is at least ${CODE_MIN}:1`, () => {
+      expect(contrast(value, hex('sand'))).toBeGreaterThanOrEqual(CODE_MIN)
+    })
+  }
+})
