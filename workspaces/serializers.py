@@ -9,10 +9,14 @@ class MemberSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TeamMember
-        fields = ('username', 'role', 'is_you')
+        fields = ('id', 'username', 'role', 'is_you')  # id = the membership, what member management addresses
 
     def get_is_you(self, obj):
         return obj.member_id == self.context['request'].user.id
+
+
+class MemberRoleSerializer(serializers.Serializer):
+    role = serializers.ChoiceField(choices=TeamMember.Roles.choices)
 
 
 class WorkspaceSerializer(serializers.ModelSerializer):

@@ -72,9 +72,11 @@ class WorkspaceApiTests(APITestCase):
         self.assertEqual([(m['username'], m['role'], m['is_you']) for m in data[0]['members']],
                          [('Acme-owner', R.OWNER, False), ('Acme-admin', R.ADMIN, False),
                           ('Acme-editor', R.EDITOR, False), ('Acme-viewer', R.VIEWER, True)])
-        self.assertEqual(data[1]['members'], [{'username': 'Acme-viewer', 'role': R.VIEWER, 'is_you': True}])
+        mine = TeamMember.objects.get(workspace_id=data[1]['id'], member=self.u['viewer'])
+        self.assertEqual(data[1]['members'], [{'id': mine.id, 'username': 'Acme-viewer', 'role': R.VIEWER, 'is_you': True}])
 
     def test_create_response_lists_the_owner(self):
         self.as_('outsider')
         r = self.client.post('/api/workspaces/', {'name': 'Mine'})
-        self.assertEqual(r.data['members'], [{'username': 'Acme-outsider', 'role': R.OWNER, 'is_you': True}])
+        mine = TeamMember.objects.get(workspace_id=r.data['id'], member=self.u['outsider'])
+        self.assertEqual(r.data['members'], [{'id': mine.id, 'username': 'Acme-outsider', 'role': R.OWNER, 'is_you': True}])
