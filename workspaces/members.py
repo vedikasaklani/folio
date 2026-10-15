@@ -12,7 +12,7 @@ from django.db import transaction
 from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import APIException, NotFound, PermissionDenied
 
-from .models import TeamMember, Workspace
+from .models import Invite, TeamMember, Workspace
 from .permissions import CAN_MANAGE
 
 R = TeamMember.Roles
@@ -75,3 +75,19 @@ def leave(workspace, user):
     actor = _lock_and_load_actor(workspace, user)  # any member may leave; the last Owner may not
     _check_not_last_owner(actor)
     actor.delete()
+
+
+@transaction.atomic
+def accept_invite(token, user):
+    """Joins `user` to the invite's workspace with the invite's role and returns the workspace.
+    Single use: the link is used up by the first person it adds. Someone already in the workspace keeps their role
+    and leaves the link unused (opening your own link by mistake does not waste it).
+    The invite row is locked, so two people opening one link at the same moment cannot both get in: the second
+    waits, then finds the link used and gets the same 404 as for any bad link."""
+    invite = Invite.find_active(token, lock=True)
+    if invite is None:
+        raise NotFound('This invite link is invalid, used or expired.')
+    _, joined = TeamMember.objects.get_or_create(workspace=invite.workspace, member=user, defaults={'role': invite.role})
+    if joined:
+        invite.revoke()
+    return invite.workspace

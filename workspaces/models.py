@@ -44,7 +44,8 @@ def hash_token(token):
 
 class Invite(models.Model):
     """A shareable join link. Only the hash of its token is stored; the token itself is shown once, at creation.
-    Reusable until it expires or is revoked. It can grant any role except Owner (enforced by the database too)."""
+    Single use: the first person it adds uses it up (revoked_at is set), and it expires after a day anyway.
+    It can grant any role except Owner (enforced by the database too)."""
     workspace=models.ForeignKey(Workspace, on_delete=models.CASCADE, related_name='invites')
     role=models.CharField(max_length=2, choices=TeamMember.Roles.choices)
     token_hash=models.CharField(max_length=64, unique=True)  # unique also builds the index the accept lookup uses
@@ -74,12 +75,13 @@ class Invite(models.Model):
         return invite, token
 
     @classmethod
-    def find_active(cls, token):
+    def find_active(cls, token, lock=False):
         """The invite for this token, or None. Unknown, expired and revoked all look the same on purpose,
-        so nobody can probe which tokens ever existed."""
-        return (cls.objects.select_related('workspace')
-                .filter(token_hash=hash_token(token), revoked_at__isnull=True, expires_at__gt=timezone.now())
-                .first())
+        so nobody can probe which tokens ever existed. lock=True holds the invite row until the transaction ends."""
+        qs = cls.objects.select_related('workspace')
+        if lock:
+            qs = qs.select_for_update(of=('self',))  # only the invite row, not the joined workspace
+        return qs.filter(token_hash=hash_token(token), revoked_at__isnull=True, expires_at__gt=timezone.now()).first()
 
     def revoke(self):
         if self.revoked_at is None:

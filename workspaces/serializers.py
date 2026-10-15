@@ -19,6 +19,14 @@ class MemberRoleSerializer(serializers.Serializer):
     role = serializers.ChoiceField(choices=TeamMember.Roles.choices)
 
 
+class InviteCreateSerializer(serializers.Serializer):
+    role = serializers.ChoiceField(choices=[c for c in TeamMember.Roles.choices if c[0] != TeamMember.Roles.OWNER])
+
+
+class InviteAcceptSerializer(serializers.Serializer):
+    token = serializers.CharField(max_length=100)
+
+
 class WorkspaceSerializer(serializers.ModelSerializer):
     role = serializers.CharField(read_only=True)  # the caller's role, annotated in the view
     members = MemberSerializer(source='memberships', many=True, read_only=True)
