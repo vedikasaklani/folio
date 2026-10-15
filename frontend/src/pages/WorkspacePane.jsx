@@ -19,7 +19,6 @@ function WorkspaceCard({ workspace, tone, lead, onPick }) {
   const others = workspace.members.filter((m) => !m.is_you)
   return (
     <Card as="li" variant="tint" tone={tone} className="ws-card">
-      {lead ? <p className="t-caption">Last opened</p> : null}
       <div className="ws-card__top">
         <button type="button" className="ws-card__open t-heading" onClick={() => onPick(workspace.id)}>
           {workspace.name}
@@ -46,6 +45,8 @@ function WorkspaceCard({ workspace, tone, lead, onPick }) {
           </ul>
         ) : null}
       </div>
+      {/* every card has this slot, filled or not, so the tag can never change a card's height */}
+      <div className="ws-card__foot">{lead ? <Badge>Last opened</Badge> : null}</div>
     </Card>
   )
 }

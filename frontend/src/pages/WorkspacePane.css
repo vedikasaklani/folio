@@ -31,10 +31,18 @@
 
 .ws-card {
   position: relative; /* anchors the stretched "open" button */
-  display: grid;
-  align-content: start;
+  display: flex;
+  flex-direction: column;
   gap: var(--s-3);
   min-height: 11rem;
+}
+
+/* The footer slot is part of every card's template: bottom right, tall enough for a tag, empty for most cards. */
+.ws-card__foot {
+  display: flex;
+  justify-content: flex-end;
+  min-height: 1.5rem;
+  margin-top: auto;
 }
 
 .ws-card__top {
@@ -83,7 +91,6 @@
 .ws-card__members {
   display: grid;
   gap: var(--s-2);
-  align-self: end;
 }
 
 .ws-card__members p {
